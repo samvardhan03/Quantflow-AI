@@ -5,6 +5,8 @@ b.Leveraged Buyout (LBO) Model with Multi-Scenario Analysis: Dynamically evaluat
 c.Monte Carlo Simulations: Forecasts financial outcomes and risk probabilities using advanced stochastic methods.
 The application employs AI techniques (GBDT, Q-Learning, Policy Gradient Methods) and React-based interactive UI for seamless and intelligent financial modeling.
 
+<img width="805" alt="crypto-screener-cover-image" src="https://github.com/user-attachments/assets/756e479a-9229-43e5-9554-722e35151a9d" />
+
 Working:
 1. Backend Models
 Private Equity Waterfall Model:
