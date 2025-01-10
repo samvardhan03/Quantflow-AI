@@ -1,96 +1,64 @@
 import React, { useState } from "react";
 
-function WaterfallModel() {
-  const [inputData, setInputData] = useState({
-    fund_size: "",
-    hurdle_rate: "",
-    cash_flows: "",
-    lp_split: "",
-    gp_split: "",
-  });
-  const [result, setResult] = useState(null);
+const WaterfallModel = () => {
+  const [capitalCalls, setCapitalCalls] = useState("");
+  const [returns, setReturns] = useState("");
+  const [carriedInterest, setCarriedInterest] = useState(0.2);
+  const [results, setResults] = useState(null);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setInputData({ ...inputData, [name]: value });
-  };
-
-  const handleSubmit = async () => {
-    const parsedData = {
-      ...inputData,
-      cash_flows: inputData.cash_flows.split(",").map(Number),
-      profit_split: { LP: Number(inputData.lp_split), GP: Number(inputData.gp_split) },
-    };
-
-    const response = await fetch("http://127.0.0.1:5000/waterfall", {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch("/waterfall", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(parsedData),
+      body: JSON.stringify({
+        capital_calls: capitalCalls.split(",").map(Number),
+        returns: returns.split(",").map(Number),
+        carried_interest: parseFloat(carriedInterest),
+      }),
     });
     const data = await response.json();
-    setResult(data);
+    setResults(data);
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-3xl font-semibold text-gray-700">Waterfall Distribution</h2>
-      <div className="mt-6 space-y-4">
-        {/* Input Fields */}
-        <input
-          type="number"
-          name="fund_size"
-          value={inputData.fund_size}
-          onChange={handleInputChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          placeholder="Fund Size (e.g., 1000000)"
-        />
-        <input
-          type="number"
-          name="hurdle_rate"
-          value={inputData.hurdle_rate}
-          onChange={handleInputChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          placeholder="Hurdle Rate (e.g., 0.08)"
-        />
+    <div id="waterfall">
+      <h2>Private Equity Waterfall Model</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Capital Calls (comma-separated):</label>
         <input
           type="text"
-          name="cash_flows"
-          value={inputData.cash_flows}
-          onChange={handleInputChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          placeholder="Cash Flows (comma-separated, e.g., 200000,300000,500000)"
+          value={capitalCalls}
+          onChange={(e) => setCapitalCalls(e.target.value)}
+          required
         />
+        <label>Returns (comma-separated):</label>
+        <input
+          type="text"
+          value={returns}
+          onChange={(e) => setReturns(e.target.value)}
+          required
+        />
+        <label>Carried Interest (decimal):</label>
         <input
           type="number"
-          name="lp_split"
-          value={inputData.lp_split}
-          onChange={handleInputChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          placeholder="LP Split (%) (e.g., 80)"
+          step="0.01"
+          value={carriedInterest}
+          onChange={(e) => setCarriedInterest(e.target.value)}
+          required
         />
-        <input
-          type="number"
-          name="gp_split"
-          value={inputData.gp_split}
-          onChange={handleInputChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          placeholder="GP Split (%) (e.g., 20)"
-        />
-        <button
-          onClick={handleSubmit}
-          className="w-full py-2 bg-blue-600 text-white rounded"
-        >
-          Calculate Waterfall
-        </button>
-        {result && (
-          <div className="mt-6">
-            <h3 className="text-xl">Waterfall Results</h3>
-            <pre className="bg-gray-100 p-4 rounded mt-4">{JSON.stringify(result, null, 2)}</pre>
-          </div>
-        )}
-      </div>
+        <button type="submit">Calculate</button>
+      </form>
+      {results && (
+        <div>
+          <h3>Results</h3>
+          <p>LP Distribution: {results.lp_distribution.join(", ")}</p>
+          <p>GP Distribution: {results.gp_distribution.join(", ")}</p>
+          <p>Total Distribution: {results.total_distribution.join(", ")}</p>
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default WaterfallModel;
