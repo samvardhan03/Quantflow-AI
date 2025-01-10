@@ -1,33 +1,25 @@
-def calculate_lbo(data):
-    """
-    Calculate leveraged buyout (LBO) model.
-    Args:
-        data (dict): Acquisition price, debt-equity ratio, cash flows, and exit multiple.
-    Returns:
-        dict: LBO model results including debt schedule, equity return, and IRR.
-    """
-    acquisition_price = data['acquisition_price']
-    debt_equity_ratio = data['debt_equity_ratio']
-    projected_cash_flows = data['projected_cash_flows']
+import numpy as np
+import pandas as pd
+
+def run_lbo_model(data):
+    initial_debt = data['initial_debt']
+    initial_equity = data['initial_equity']
+    cash_flows = np.array(data['cash_flows'])
+    interest_rate = data['interest_rate']
     exit_multiple = data['exit_multiple']
 
-    debt = acquisition_price * debt_equity_ratio
-    equity = acquisition_price - debt
+    equity_values = []
+    debt = initial_debt
+    equity = initial_equity
 
-    debt_schedule = []
-    remaining_debt = debt
-    for cash in projected_cash_flows:
-        repayment = min(remaining_debt, cash)
-        remaining_debt -= repayment
-        debt_schedule.append({"repayment": repayment, "remaining_debt": remaining_debt})
-
-    exit_value = projected_cash_flows[-1] * exit_multiple
-    equity_return = exit_value - remaining_debt
-
-    irr = ((equity_return / equity) ** (1 / len(projected_cash_flows))) - 1
+    for cash_flow in cash_flows:
+        repayment = min(debt, cash_flow)
+        debt -= repayment
+        equity += repayment
+        equity_values.append(equity + debt * (1 + interest_rate) * (exit_multiple - 1))
 
     return {
-        "debt_schedule": debt_schedule,
-        "equity_return": equity_return,
-        "irr": irr
+        "equity_values": equity_values,
+        "final_debt": debt,
+        "final_equity": equity
     }
