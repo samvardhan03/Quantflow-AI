@@ -5,4 +5,4 @@ Leveraged Buyout (LBO) Model with Multi-Scenario Analysis: Dynamically evaluates
 Monte Carlo Simulations: Forecasts financial outcomes and risk probabilities using advanced stochastic methods.
 The application employs AI techniques (GBDT, Q-Learning, Policy Gradient Methods) and React-based interactive UI for seamless and intelligent financial modeling.
 
-##Working
+#Working
